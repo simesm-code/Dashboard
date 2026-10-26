@@ -384,73 +384,67 @@
     // ----------------------------------------------------
     // 3. MIDDLESBROUGH FC FIXTURE (TheSportsDB ID: 133827)
     // ----------------------------------------------------
+    
     async function fetchBoroFixture() {
-      const widget = document.getElementById('mfc-widget');
-      const teamId = '133827';
-      const endpoint = `https://www.thesportsdb.com/api/v1/json/3/eventsnext.php?id=${teamId}`;
+  const widget = document.getElementById('mfc-widget');
+  const apiKey = "1ad3a9b42263068ab8dcf4a3f4e6bef4";
+  
+  // Wrap API-Football in a CORS proxy URL
+  const targetUrl = `https://v3.football.api-sports.io/fixtures?team=70&next=1`;
+  const proxyUrl = `https://corsproxy.io/?` + encodeURIComponent(targetUrl);
 
-      try {
-        const response = await fetch(endpoint);
-        if (!response.ok) throw new Error('Network response failed');
-        
-        const data = await response.json();
-
-        if (data && data.events && data.events.length > 0) {
-          const match = data.events[0];
-          const matchName = match.strEvent || 'Middlesbrough FC';
-          const dateStr = match.dateEvent || '';
-          const timeStr = match.strTime || '';
-          const venue = match.strVenue || 'To Be Confirmed';
-          const league = match.strLeague || 'EFL Championship';
-
-          // Format Date and Time
-          let formattedDateTime = 'TBD';
-          if (dateStr) {
-            const dateObj = new Date(`${dateStr}T${timeStr || '15:00:00'}`);
-            formattedDateTime = dateObj.toLocaleDateString('en-GB', {
-              weekday: 'short',
-              day: 'numeric',
-              month: 'short',
-              year: 'numeric'
-            });
-            
-            if (timeStr) {
-              const formattedTime = timeStr.substring(0, 5);
-              formattedDateTime += ` at ${formattedTime}`;
-            }
-          }
-
-          widget.innerHTML = `
-            <div class="fixture-header">
-              <div class="match-title">${escapeHtml(matchName)}</div>
-              <div class="match-meta">🏆 ${escapeHtml(league)}</div>
-            </div>
-            <div class="fixture-details">
-              <div class="detail-item">
-                <span>📅</span> <strong>Kickoff:</strong> ${escapeHtml(formattedDateTime)}
-              </div>
-              <div class="detail-item">
-                <span>📍</span> <strong>Stadium:</strong> ${escapeHtml(venue)}
-              </div>
-            </div>
-            <span class="badge-status">Next Scheduled Fixture</span>
-          `;
-        } else {
-          widget.innerHTML = `
-            <div class="empty-state">
-              No upcoming fixtures found for Middlesbrough FC currently.
-            </div>
-          `;
-        }
-      } catch (err) {
-        console.error('Error fetching fixture:', err);
-        widget.innerHTML = `
-          <div class="empty-state" style="color: #ef4444;">
-            Unable to load live fixture info at the moment.
-          </div>
-        `;
+  try {
+    const response = await fetch(proxyUrl, {
+      method: 'GET',
+      headers: {
+        'x-apisports-key': apiKey
       }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+
+    const data = await response.json();
+
+    if (data.response && data.response.length > 0) {
+      const match = data.response[0];
+      const home = match.teams.home;
+      const away = match.teams.away;
+      const fixtureDate = new Date(match.fixture.date);
+      const formattedDate = fixtureDate.toLocaleDateString(undefined, {
+        weekday: 'short', month: 'short', day: 'numeric'
+      });
+      const formattedTime = fixtureDate.toLocaleTimeString(undefined, {
+        hour: '2-digit', minute: '2-digit'
+      });
+      const venue = match.fixture.venue.name || "TBD";
+
+      widget.innerHTML = `
+        <div class="team-container">
+          <div class="team-box">
+            <img class="team-logo" src="${home.logo}" alt="${home.name}">
+            <div class="team-name">${home.name}</div>
+          </div>
+          <div class="vs-badge">VS</div>
+          <div class="team-box">
+            <img class="team-logo" src="${away.logo}" alt="${away.name}">
+            <div class="team-name">${away.name}</div>
+          </div>
+        </div>
+        <div class="match-meta">
+          <div>📅 ${formattedDate} at ${formattedTime}</div>
+          <div>📍 ${venue}</div>
+        </div>
+      `;
+    } else {
+      widget.innerHTML = '<p style="text-align:center;">No upcoming fixtures scheduled right now.</p>';
+    }
+  } catch (err) {
+    console.error("Fetch Error:", err);
+    widget.innerHTML = `<p style="color:red; text-align:center;">Failed to load match data: ${err.message}</p>`;
+  }
+}
 
     // Execute fixture fetch on page load
     fetchBoroFixture();
