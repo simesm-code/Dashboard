@@ -132,6 +132,39 @@ async function fetchNextMatch() {
 }
 
 // Call the function when the page loads
-fetchNextMatch();</div>div>
+fetchNextMatch();</div>
+
+  // 3. Free Live Boro Fixture Fetcher (No API Key Required)
+    async function fetchBoroFixture() {
+      const widget = document.getElementById('mfc-widget');
+      // TheSportsDB Team ID for Middlesbrough FC is 133827
+      const url = 'https://www.thesportsdb.com/api/v1/json/3/eventsnext.php?id=133827';
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data && data.events && data.events.length > 0) {
+          const nextMatch = data.events[0];
+          const matchName = nextMatch.strEvent; // e.g., "Middlesbrough vs Wrexham"
+          const date = nextMatch.dateEvent;     // e.g., "2026-10-31"
+          const time = nextMatch.strTime;       // e.g., "15:00:00"
+          const venue = nextMatch.strVenue || "TBD";
+
+          widget.innerHTML = `
+            <h4 style="margin: 5px 0; font-size: 1.2rem;">${matchName}</h4>
+            <p style="margin: 5px 0; color: #555;">📅 <strong>Date:</strong> ${date} at ${time.substring(0, 5)}</p>
+            <p style="margin: 5px 0; color: #777;">📍 <strong>Venue:</strong> ${venue}</p>
+          `;
+        } else {
+          widget.innerHTML = '<p>No upcoming matches scheduled currently.</p>';
+        }
+      } catch (err) {
+        console.error(err);
+        widget.innerHTML = '<p style="color:red;">Unable to load fixture data right now.</p>';
+      }
+    }
+
+    fetchBoroFixture();
 </body>
 </html>
