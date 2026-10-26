@@ -90,6 +90,54 @@
     }
   </script>
 
+
+    <div id="boro">
+    // Replace with your actual key from API-Sports / RapidAPI
+const apiKey = "1ad3a9b42263068ab8dcf4a3f4e6bef4";
+
+// Team ID 70 = Middlesbrough FC in API-Football
+const teamId = 70; 
+
+async function fetchNextMatch() {
+  try {
+    const response = await fetch(`https://v3.football.api-sports.io/fixtures?team=${teamId}&next=1`, {
+      method: "GET",
+      headers: {
+        "x-apisports-key": apiKey
+      }
+    });
+    
+    const data = await response.json();
+    
+    if (data.response && data.response.length > 0) {
+      const match = data.response[0];
+      const homeTeam = match.teams.home.name;
+      const awayTeam = match.teams.away.name;
+      const matchDate = new Date(match.fixture.date).toLocaleString([], {
+        weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+      const venue = match.fixture.venue.name;
+
+      // Update the HTML element on your iPad screen
+      document.getElementById('mfc-widget').innerHTML = `
+        <div style="text-align: center; padding: 10px;">
+          <p style="font-weight: bold; margin: 0; color: #e60000;">NEXT BORO MATCH</p>
+          <h4 style="margin: 5px 0;">${homeTeam} vs ${awayTeam}</h4>
+          <p style="font-size: 0.9rem; color: #666; margin: 0;">📅 ${matchDate}</p>
+          <p style="font-size: 0.8rem; color: #888; margin: 0;">📍 ${venue}</p>
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error("Error fetching match data:", error);
+  }
+}
+
+// Call the function when the page loads
+fetchNextMatch();
+    </div>
+
+
   // 3. Free Live Boro Fixture Fetcher (No API Key Required)
     async function fetchBoroFixture() {
       const widget = document.getElementById('mfc-widget');
