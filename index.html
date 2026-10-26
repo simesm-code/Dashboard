@@ -3,172 +3,457 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Family Dashboard</title>
+  <title>Smith Family Dashboard</title>
   <style>
+    :root {
+      --bg-color: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --mfc-red: #e60000;
+      --mfc-red-hover: #cc0000;
+      --accent-blue: #2563eb;
+      --accent-green: #16a34a;
+      --border-color: #e2e8f0;
+      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: #f4f6f8;
-      color: #333;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px;
-      margin: 0;
+      padding: 24px 16px;
     }
-    h1 { color: #2c3e50; margin-bottom: 5px; }
-    .clock {
-      font-size: 2.5rem;
-      font-weight: bold;
-      color: #2980b9;
-      margin-bottom: 20px;
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+      width: 100%;
+      max-width: 800px;
     }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.025em;
+      margin-bottom: 6px;
+    }
+
+    /* Clock Widget */
+    .clock-container {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 16px 28px;
+      display: inline-block;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-color);
+      margin-top: 8px;
+    }
+
+    .time {
+      font-size: 2.75rem;
+      font-weight: 800;
+      color: var(--text-main);
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+
+    .date {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-top: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Dashboard Layout Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 800px;
+    }
+
+    /* Card Styling */
     .card {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    ul { list-style: none; padding: 0; }
-    li {
-      padding: 10px;
-      border-bottom: 1px solid #eee;
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-color);
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
     }
-    input, button {
-      padding: 10px;
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    /* MFC Card Styling */
+    .card-mfc {
+      border-top: 6px solid var(--mfc-red);
+      position: relative;
+    }
+
+    .card-mfc .card-title {
+      color: var(--mfc-red);
+    }
+
+    .mfc-content {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .fixture-header {
+      background: #fef2f2;
+      border: 1px solid #fee2e2;
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .match-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #991b1b;
+      margin-bottom: 4px;
+    }
+
+    .match-meta {
+      font-size: 0.9rem;
+      color: #7f1d1d;
+      font-weight: 500;
+    }
+
+    .fixture-details {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      padding: 4px 0;
+    }
+
+    .detail-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-status {
+      display: inline-block;
+      align-self: flex-start;
+      background-color: #f1f5f9;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Shopping List Styling */
+    .shopping-input-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 12px 14px;
       font-size: 1rem;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      background: #f8fafc;
     }
-    button {
-      background-color: #27ae60;
+
+    input[type="text"]:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      background: #ffffff;
+    }
+
+    button.btn-add {
+      background-color: var(--accent-green);
       color: white;
       border: none;
+      padding: 12px 18px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 10px;
       cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    button.btn-add:active {
+      background-color: #15803d;
+    }
+
+    .shopping-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 280px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .shopping-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background-color: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+
+    .btn-delete {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 2px 8px;
+      border-radius: 6px;
+      line-height: 1;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
+
+    .btn-delete:hover, .btn-delete:active {
+      color: #ef4444;
+      background-color: #fee2e2;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      padding: 16px;
+      font-style: italic;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
 
-  <h1>Smith Family Dashboard</h1>
-  <div class="clock" id="clock">00:00:00</div>
-
-  <div class="card">
-    <h3>🛒 Shopping List</h3>
-    <div style="display: flex; gap: 10px;">
-      <input type="text" id="itemInput" placeholder="Add an item..." style="flex: 1;">
-      <button onclick="addItem()">Add</button>
+  <header>
+    <h1>Smith Family Dashboard</h1>
+    <div class="clock-container">
+      <div class="time" id="clock-time">00:00:00</div>
+      <div class="date" id="clock-date">Loading date...</div>
     </div>
-    <ul id="shoppingList">
-      <li><span>Milk</span></li>
-      <li><span>Bread</span></li>
-    </ul>
-  </div>
+  </header>
+
+  <main class="dashboard-grid">
+    <!-- MIDDLESBROUGH FC FIXTURE CARD -->
+    <section class="card card-mfc">
+      <div class="card-title">
+        <span>⚽</span> Middlesbrough FC Next Match
+      </div>
+      <div class="mfc-content" id="mfc-widget">
+        <div class="empty-state">Fetching upcoming fixture details...</div>
+      </div>
+    </section>
+
+    <!-- SHOPPING LIST CARD -->
+    <section class="card">
+      <div class="card-title">
+        <span>🛒</span> Shopping List
+      </div>
+      <div class="shopping-input-group">
+        <input type="text" id="itemInput" placeholder="Add an item..." onkeydown="handleKeyPress(event)">
+        <button class="btn-add" onclick="addItem()">Add</button>
+      </div>
+      <ul class="shopping-list" id="shoppingList">
+        <li class="shopping-item">
+          <span>Milk</span>
+          <button class="btn-delete" onclick="removeItem(this)">✕</button>
+        </li>
+        <li class="shopping-item">
+          <span>Bread</span>
+          <button class="btn-delete" onclick="removeItem(this)">✕</button>
+        </li>
+      </ul>
+    </section>
+  </main>
 
   <script>
-    // Live Digital Clock Logic
+    // ----------------------------------------------------
+    // 1. LIVE DIGITAL CLOCK
+    // ----------------------------------------------------
     function updateClock() {
       const now = new Date();
-      document.getElementById('clock').innerText = now.toLocaleTimeString();
+      
+      // Time formatting (HH:MM:SS)
+      const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+      document.getElementById('clock-time').innerText = now.toLocaleTimeString('en-GB', timeOptions);
+      
+      // Date formatting (e.g. Monday, 26 October 2026)
+      const dateOptions = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+      document.getElementById('clock-date').innerText = now.toLocaleDateString('en-GB', dateOptions);
     }
-    setInterval(updateClock, 1000);
+    
+    // Initial call and set 1-second interval
     updateClock();
+    setInterval(updateClock, 1000);
 
-    // Shopping List Logic
+    // ----------------------------------------------------
+    // 2. SHOPPING LIST INTERACTION
+    // ----------------------------------------------------
     function addItem() {
       const input = document.getElementById('itemInput');
       const text = input.value.trim();
+      
       if (text !== '') {
+        const list = document.getElementById('shoppingList');
+        
+        // Remove empty state message if present
+        const emptyMsg = list.querySelector('.empty-state');
+        if (emptyMsg) emptyMsg.remove();
+
+        // Create new item row
         const li = document.createElement('li');
-        li.innerHTML = `<span>${text}</span>`;
-        document.getElementById('shoppingList').appendChild(li);
+        li.className = 'shopping-item';
+        li.innerHTML = `
+          <span>${escapeHtml(text)}</span>
+          <button class="btn-delete" onclick="removeItem(this)" title="Delete item">✕</button>
+        `;
+        
+        list.appendChild(li);
         input.value = '';
+        input.focus();
       }
     }
-  </script>
 
+    function removeItem(buttonElement) {
+      const li = buttonElement.parentElement;
+      li.remove();
 
-    <div id="boro">
-    // Replace with your actual key from API-Sports / RapidAPI
-const apiKey = "1ad3a9b42263068ab8dcf4a3f4e6bef4";
-
-// Team ID 70 = Middlesbrough FC in API-Football
-const teamId = 70; 
-
-async function fetchNextMatch() {
-  try {
-    const response = await fetch(`https://v3.football.api-sports.io/fixtures?team=${teamId}&next=1`, {
-      method: "GET",
-      headers: {
-        "x-apisports-key": apiKey
+      const list = document.getElementById('shoppingList');
+      if (list.children.length === 0) {
+        list.innerHTML = '<div class="empty-state">Your shopping list is currently empty.</div>';
       }
-    });
-    
-    const data = await response.json();
-    
-    if (data.response && data.response.length > 0) {
-      const match = data.response[0];
-      const homeTeam = match.teams.home.name;
-      const awayTeam = match.teams.away.name;
-      const matchDate = new Date(match.fixture.date).toLocaleString([], {
-        weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-      });
-      const venue = match.fixture.venue.name;
-
-      // Update the HTML element on your iPad screen
-      document.getElementById('mfc-widget').innerHTML = `
-        <div style="text-align: center; padding: 10px;">
-          <p style="font-weight: bold; margin: 0; color: #e60000;">NEXT BORO MATCH</p>
-          <h4 style="margin: 5px 0;">${homeTeam} vs ${awayTeam}</h4>
-          <p style="font-size: 0.9rem; color: #666; margin: 0;">📅 ${matchDate}</p>
-          <p style="font-size: 0.8rem; color: #888; margin: 0;">📍 ${venue}</p>
-        </div>
-      `;
     }
-  } catch (error) {
-    console.error("Error fetching match data:", error);
-  }
-}
 
-// Call the function when the page loads
-fetchNextMatch();
-    </div>
+    function handleKeyPress(event) {
+      if (event.key === 'Enter') {
+        addItem();
+      }
+    }
 
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.innerText = text;
+      return div.innerHTML;
+    }
 
-  // 3. Free Live Boro Fixture Fetcher (No API Key Required)
+    // ----------------------------------------------------
+    // 3. MIDDLESBROUGH FC FIXTURE (TheSportsDB ID: 133827)
+    // ----------------------------------------------------
     async function fetchBoroFixture() {
       const widget = document.getElementById('mfc-widget');
-      // TheSportsDB Team ID for Middlesbrough FC is 133827
-      const url = 'https://www.thesportsdb.com/api/v1/json/3/eventsnext.php?id=133827';
+      const teamId = '133827';
+      const endpoint = `https://www.thesportsdb.com/api/v1/json/3/eventsnext.php?id=${teamId}`;
 
       try {
-        const response = await fetch(url);
+        const response = await fetch(endpoint);
+        if (!response.ok) throw new Error('Network response failed');
+        
         const data = await response.json();
 
         if (data && data.events && data.events.length > 0) {
-          const nextMatch = data.events[0];
-          const matchName = nextMatch.strEvent; // e.g., "Middlesbrough vs Wrexham"
-          const date = nextMatch.dateEvent;     // e.g., "2026-10-31"
-          const time = nextMatch.strTime;       // e.g., "15:00:00"
-          const venue = nextMatch.strVenue || "TBD";
+          const match = data.events[0];
+          const matchName = match.strEvent || 'Middlesbrough FC';
+          const dateStr = match.dateEvent || '';
+          const timeStr = match.strTime || '';
+          const venue = match.strVenue || 'To Be Confirmed';
+          const league = match.strLeague || 'EFL Championship';
+
+          // Format Date and Time
+          let formattedDateTime = 'TBD';
+          if (dateStr) {
+            const dateObj = new Date(`${dateStr}T${timeStr || '15:00:00'}`);
+            formattedDateTime = dateObj.toLocaleDateString('en-GB', {
+              weekday: 'short',
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric'
+            });
+            
+            if (timeStr) {
+              const formattedTime = timeStr.substring(0, 5);
+              formattedDateTime += ` at ${formattedTime}`;
+            }
+          }
 
           widget.innerHTML = `
-            <h4 style="margin: 5px 0; font-size: 1.2rem;">${matchName}</h4>
-            <p style="margin: 5px 0; color: #555;">📅 <strong>Date:</strong> ${date} at ${time.substring(0, 5)}</p>
-            <p style="margin: 5px 0; color: #777;">📍 <strong>Venue:</strong> ${venue}</p>
+            <div class="fixture-header">
+              <div class="match-title">${escapeHtml(matchName)}</div>
+              <div class="match-meta">🏆 ${escapeHtml(league)}</div>
+            </div>
+            <div class="fixture-details">
+              <div class="detail-item">
+                <span>📅</span> <strong>Kickoff:</strong> ${escapeHtml(formattedDateTime)}
+              </div>
+              <div class="detail-item">
+                <span>📍</span> <strong>Stadium:</strong> ${escapeHtml(venue)}
+              </div>
+            </div>
+            <span class="badge-status">Next Scheduled Fixture</span>
           `;
         } else {
-          widget.innerHTML = '<p>No upcoming matches scheduled currently.</p>';
+          widget.innerHTML = `
+            <div class="empty-state">
+              No upcoming fixtures found for Middlesbrough FC currently.
+            </div>
+          `;
         }
       } catch (err) {
-        console.error(err);
-        widget.innerHTML = '<p style="color:red;">Unable to load fixture data right now.</p>';
+        console.error('Error fetching fixture:', err);
+        widget.innerHTML = `
+          <div class="empty-state" style="color: #ef4444;">
+            Unable to load live fixture info at the moment.
+          </div>
+        `;
       }
     }
 
+    // Execute fixture fetch on page load
     fetchBoroFixture();
+  </script>
 </body>
 </html>
